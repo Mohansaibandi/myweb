@@ -1,0 +1,26 @@
+pipeline{
+    agent any
+    stages{
+        stage("GIT CLONE"){
+            steps{
+                git credentialsId: 'GIT_CRED', url: 'https://github.com/Mohansaibandi/myweb.git'
+            }
+        }
+        stage("MAVEN BUILD"){
+            steps{
+                sh "mvn clean sonar:sonar package"
+            }
+        }
+        stage("DEPLOY"){
+            steps{
+                sshagent(['TOMCAT_SSH']) {
+                sh """
+                scp -o StrictHostKeyChecking=no target/myweb-8.2.0.war ec2-user@172.31.41.176:/home/ec2-user/apache-tomcat-9.0.87/webapps
+                ssh ec2-user@172.31.41.176 /home/ec2-user/apache-tomcat-9.0.87/bin/shutdown.sh
+                ssh ec2-user@172.31.41.176 /home/ec2-user/apache-tomcat-9.0.87/bin/startup.sh
+                """
+                }
+            }
+        }
+    }
+}
