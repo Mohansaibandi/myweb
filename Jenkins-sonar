@@ -11,6 +11,11 @@ pipeline{
                 sh "mvn clean sonar:sonar package"
             }
         }
+        stage("NEXUS"){
+            steps{
+             nexusArtifactUploader artifacts: [[artifactId: 'myweb', classifier: '', file: 'target/myweb-8.2.0.war', type: 'war']], credentialsId: 'NEXUS_CRED', groupId: 'GANA', nexusUrl: '172.31.35.211', nexusVersion: 'nexus3', protocol: 'http', repository: 'sample-releases', version: '8.2.0'   
+            }
+        }
         stage("DEPLOY"){
             steps{
                 sshagent(['TOMCAT_SSH']) {
