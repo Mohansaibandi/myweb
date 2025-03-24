@@ -21,18 +21,18 @@ pipeline{
         }
         stage('Upload War To Nexus'){
             steps{
-                  nexusArtifactUploader artifacts: [[artifactId: 'myweb', classifier: '', file: 'target/myweb-8.2.0.war', type: 'war']], credentialsId: 'a6e6bd11-7a0e-42a1-b886-b12a71c876ab', groupId: 'in.javahome', nexusUrl: '3.112.4.138:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'sample-releases', version: '8.2.0'  
+                  nexusArtifactUploader artifacts: [[artifactId: 'myweb', classifier: '', file: 'target/myweb-8.2.0.war', type: 'war']], credentialsId: 'a6e6bd11-7a0e-42a1-b886-b12a71c876ab', groupId: 'in.javahome', nexusUrl: '172.31.45.97:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'sample-releases', version: '8.2.0'  
               }
             }
         stage("deploy-dev"){
             steps{
-                sshagent(['tomcat']) {
+                sshagent(['tomcat-new']) {
                 sh """
-                    scp -o StrictHostKeyChecking=no target/myweb-8.2.0.war  ec2-user@13.231.54.144:/home/ec2-user/apache-tomcat-10.1.39/webapps/
+                    scp -o StrictHostKeyChecking=no target/myweb-8.2.0.war  ec2-user@172.31.41.119:/home/ec2-user/apache-tomcat-9.0.102/webapps/
                     
-                    ssh ec2-user@13.231.54.144 /home/ec2-user/apache-tomcat-10.1.39/bin/shutdown.sh
+                    ssh ec2-user@172.31.41.119 /home/ec2-user/apache-tomcat-9.0.102/bin/shutdown.sh
                     
-                    ssh ec2-user@13.231.54.144 /home/ec2-user/apache-tomcat-10.1.39/bin/startup.sh
+                    ssh ec2-user@172.31.41.119 /home/ec2-user/apache-tomcat-9.0.102/bin/startup.sh
                 
                 """
             }
